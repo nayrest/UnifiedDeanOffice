@@ -1,90 +1,101 @@
-# app/python/models.py
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List
 from datetime import datetime
+from typing import Optional, List
+
+from sqlmodel import SQLModel, Field, Relationship
 
 
-# =============================
-# Пользователи
-# =============================
+# =======================================================
+# USERS
+# =======================================================
+
 class User(SQLModel, table=True):
+    __tablename__ = "users"
+
     id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(index=True, unique=True)           # внешний ID MAX
+    name: Optional[str] = Field(default=None)
+    role: str = Field(default="user")
+    group: Optional[str] = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    user_id: int  # ID пользователя в MAX
-    name: Optional[str] = None
-    group: Optional[str] = None
-    role: str = "user"     # user | admin | dean | operator
-
-    created_at: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat()
-    )
-
-    # Связи
+    # Relationships
     requests: List["Request"] = Relationship(back_populates="user")
     callbacks: List["CallbackRequest"] = Relationship(back_populates="user")
+    broadcasts: List["DeanBroadcast"] = Relationship(back_populates="admin")
 
 
-# =============================
-# Заявка в деканат
-# =============================
+# =======================================================
+# REQUESTS
+# =======================================================
+
 class Request(SQLModel, table=True):
+    __tablename__ = "requests"
+
     id: Optional[int] = Field(default=None, primary_key=True)
-
-    user_id: int = Field(foreign_key="user.user_id")
-    type: str                                  # "справка", "вопрос", "заявление"
-    text: str                                  # текст заявки
-    status: str = "new"                        # new | in_progress | done | rejected
-    created_at: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat()
-    )
-
-    # связь с юзером
-    user: Optional[User] = Relationship(back_populates="requests")
-
-
-# =============================
-# Запрос перезвона из деканата
-# =============================
-class CallbackRequest(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-
-    user_id: int = Field(foreign_key="user.user_id")
-    phone: str
-    comment: Optional[str] = None
-    status: str = "waiting"                     # waiting | processing | success | failed
-    created_at: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat()
-    )
-
-    user: Optional[User] = Relationship(back_populates="callbacks")
-
-
-# =============================
-# Массовая рассылка от деканата
-# =============================
-class DeanBroadcast(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-
-    admin_id: int = Field(foreign_key="user.user_id")
+    user_id: int = Field(foreign_key="users.user_id", index=True)
+    type: str
     text: str
-    created_at: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat()
+    status: str = "new"
+    comment: Optional[str] = Field(default=None)  # ← ДОБАВЬТЕ ЭТУ СТРОКУ
+    processed_by: Optional[int] = Field(default=None)  # ← внешний ID админа
+    processed_at: Optional[datetime] = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    user: Optional[User] = Relationship(
+        back_populates="requests",
+        sa_relationship_kwargs={"foreign_keys": "Request.user_id"}
     )
 
-    # вложения → через отдельную таблицу
+
+
+# =======================================================
+# CALLBACK REQUESTS
+# =======================================================
+
+class CallbackRequest(SQLModel, table=True):
+    __tablename__ = "callback_requests"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.user_id", index=True)  # ← внешний ID
+    phone: str
+    comment: Optional[str] = Field(default=None)
+    status: str = Field(default="waiting")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # ← Правильный способ указать, какой именно столбец участвует в связи
+    user: Optional[User] = Relationship(
+        back_populates="callbacks",
+        sa_relationship_kwargs={"foreign_keys": "CallbackRequest.user_id"}
+    )
+
+
+# =======================================================
+# BROADCASTS
+# =======================================================
+
+class DeanBroadcast(SQLModel, table=True):
+    __tablename__ = "dean_broadcasts"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    admin_id: int = Field(foreign_key="users.id")
+    text: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    admin: Optional[User] = Relationship(back_populates="broadcasts")
     attachments: List["DeanAttachment"] = Relationship(back_populates="broadcast")
 
 
-# =============================
-# Вложения к рассылке
-# =============================
+# =======================================================
+# BROADCAST ATTACHMENTS
+# =======================================================
+
 class DeanAttachment(SQLModel, table=True):
+    __tablename__ = "dean_attachments"
+
     id: Optional[int] = Field(default=None, primary_key=True)
-
-    broadcast_id: int = Field(foreign_key="deanbroadcast.id")
-
-    type: str            # "image" | "video" | "file" | "audio"
-    url: str             # ссылка MAX API
+    broadcast_id: int = Field(foreign_key="dean_broadcasts.id")
+    type: str
+    url: str
     filename: Optional[str] = None
 
     broadcast: Optional[DeanBroadcast] = Relationship(back_populates="attachments")

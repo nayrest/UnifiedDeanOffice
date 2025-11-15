@@ -1,33 +1,33 @@
-# app/db.py
-from sqlmodel import SQLModel, create_engine, Session
 import os
-from dotenv import load_dotenv
+from contextlib import contextmanager
 
-load_dotenv()
+from sqlmodel import SQLModel, create_engine, Session
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./unibot.db")
-
-# Для SQLite обязательно нужно отключить check_same_thread
-connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-
-engine = create_engine(
-    DATABASE_URL,
-    echo=False,
-    connect_args=connect_args
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg://postgres:i4tpx70As@localhost:5432/unidecanat"
 )
+
+engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
+
+
+@contextmanager
+def get_session():
+    """
+    Корректный контекстный менеджер для работы с БД.
+    Использование:
+        with get_session() as s:
+            ...
+    """
+    with Session(engine) as session:
+        yield session
 
 
 def init_db():
     """
-    Создаёт все таблицы из models.py
+    Один раз создаёт таблицы в БД.
+    Вызвать из консоли:
+        python app.py init_db
     """
-    from models import User, Request, CallbackRequest, DeanBroadcast, DeanAttachment
+    from models import User, Request, CallbackRequest, DeanBroadcast, DeanAttachment  # noqa
     SQLModel.metadata.create_all(engine)
-    print("База данных инициализирована")
-
-
-def get_session():
-    """
-    Открывает сессию к базе данных
-    """
-    return Session(engine)

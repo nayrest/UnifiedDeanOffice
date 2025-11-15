@@ -34,14 +34,20 @@ export async function sendBroadcastToAll(adminId, text, attachments = []) {
   console.log("Вложений:", attachments.length);
 
   const users = await runPython("list_users", []);
+  const targetUsers = users.filter(u => u.role === "user");
 
   let sent = 0;
   let skipped = 0;
 
-  for (const u of users) {
-    const ok = await sendToUser(u.user_id, text, attachments);
-    if (ok) sent++;
-    else skipped++;
+  for (const u of targetUsers) {
+    try {
+      await bot.api.sendMessageToUser(u.user_id, text, {
+        attachments
+      });
+      sent++;
+    } catch (e) {
+      skipped++;
+    }
   }
 
   console.log("=== Конец рассылки ===");

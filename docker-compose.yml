@@ -1,0 +1,29 @@
+# твой текущий docker-compose.yml — ОСТАВЬ КАК ЕСТЬ
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: unidecanat
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  bot:
+    build: .                  # ← использует твой новый Dockerfile
+    restart: always
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/unidecanat
+    depends_on:
+      - db
+    volumes:
+      - .:/app                 # ← горячая перезагрузка кода при разработке
+
+volumes:
+  postgres_data:
