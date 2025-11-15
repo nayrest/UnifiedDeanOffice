@@ -14,7 +14,7 @@ services:
       - "5432:5432"
 
   bot:
-    image: nayrest/deanbot-max:latest
+    image: nayrest/unifieddeanoffice:latest
     restart: always
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
