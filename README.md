@@ -58,6 +58,6 @@ docker run -d \
   --name deanbot-max \
   --restart unless-stopped \
   -e BOT_TOKEN=f9LHodD0cOIFQ6lJYInk7YBXD9LGp50hMk6tz6ITyAhyD5H7Lc_a0_5_hLW5gz7FWCaxyoRsueH2x4LW4F1X \
-  -e POSTGRES_PASSWORD=12345 \
+  -e POSTGRES_PASSWORD=postgres \
   deanbot-max
   ```
