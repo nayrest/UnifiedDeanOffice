@@ -29,35 +29,57 @@
 
 ### Вариант 1 — самый простой (через готовый образ)
 
+#### Linux
+
 ```bash
-docker run -d \
-  --name deanbot-max \
-  --restart unless-stopped \
-  -e BOT_TOKEN=f9LHodD0cOIFQ6lJYInk7YBXD9LGp50hMk6tz6ITyAhyD5H7Lc_a0_5_hLW5gz7FWCaxyoRsueH2x4LW4F1X \
-  -e POSTGRES_PASSWORD=postgres \
-  nayrest/deanbot-max:latest
+docker pull nayrest/unifieddeanoffice:latest
+cp .env.example .env
+docker compose up -d 
+docker logs unifieddeanoffice-bot-1 -f
+```
+
+#### Windows (PowerShell)
+```bash
+docker pull nayrest/unifieddeanoffice:latest
+Copy-Item .env.example .env
+docker compose up -d
+docker logs unifieddeanoffice-bot-1 -f
 
 ```
+
+#### Windows (Command Line)
+```bash
+docker pull nayrest/unifieddeanoffice:latest
+copy .env.example .env
+docker compose up -d
+docker logs unifieddeanoffice-bot-1 -f
+```
+
 ### Вариант 2 — собрать локально из кода
+
+#### Linux
 
 ```bash
 git clone https://github.com/nayrest/UnifiedDeanOffice.git
 cd UnifiedDeanOffice
-
 cp .env.example .env
-
 docker compose up -d --build
+docker logs unifieddeanoffice-bot-1 -f
+```
+#### Windows (PowerShell)
+```bash
+git clone https://github.com/nayrest/UnifiedDeanOffice.git
+cd UnifiedDeanOffice
+Copy-Item .env.example .env
+docker compose up -d --build
+docker logs unifieddeanoffice-bot-1 -f
 ```
 
-### Вариант 3 — собрать и запустить вручную
-
-docker build -t deanbot-max .
-
+#### Windows (Command Line)
 ```bash
-docker run -d \
-  --name deanbot-max \
-  --restart unless-stopped \
-  -e BOT_TOKEN=f9LHodD0cOIFQ6lJYInk7YBXD9LGp50hMk6tz6ITyAhyD5H7Lc_a0_5_hLW5gz7FWCaxyoRsueH2x4LW4F1X \
-  -e POSTGRES_PASSWORD=postgres \
-  deanbot-max
-  ```
+git clone https://github.com/nayrest/UnifiedDeanOffice.git
+cd UnifiedDeanOffice
+copy .env.example .env
+docker compose up -d --build
+docker logs unifieddeanoffice-bot-1 -f
+```
