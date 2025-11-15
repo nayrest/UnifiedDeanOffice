@@ -32,6 +32,8 @@
 #### Linux
 
 ```bash
+git clone https://github.com/nayrest/UnifiedDeanOffice.git
+cd UnifiedDeanOffice
 docker pull nayrest/unifieddeanoffice:latest
 cp .env.example .env
 docker compose up -d 
@@ -40,6 +42,8 @@ docker logs unifieddeanoffice-bot-1 -f
 
 #### Windows (PowerShell)
 ```bash
+git clone https://github.com/nayrest/UnifiedDeanOffice.git
+cd UnifiedDeanOffice
 docker pull nayrest/unifieddeanoffice:latest
 Copy-Item .env.example .env
 docker compose up -d
@@ -49,6 +53,8 @@ docker logs unifieddeanoffice-bot-1 -f
 
 #### Windows (Command Line)
 ```bash
+git clone https://github.com/nayrest/UnifiedDeanOffice.git
+cd UnifiedDeanOffice
 docker pull nayrest/unifieddeanoffice:latest
 copy .env.example .env
 docker compose up -d

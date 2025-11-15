@@ -631,7 +631,7 @@ bot.on("message_callback", async (ctx) => {
 
     let msg = "<b>Ваши заявки</b>:\n\n";
     for (const r of list) {
-      msg += `ID ${r.id}\nТип: ${r.type}\nСтатус: <b>${r.status}</b>\n\n`;
+      msg += `ID ${r.id}\nТип: ${r.type}\nТекст: ${r.text}\nСтатус: <b>${r.status}</b>\n\n`;
     }
 
     return ctx.reply(msg, { format: "html" });
