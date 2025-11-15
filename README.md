@@ -41,11 +41,10 @@ docker run -d \
 ### Вариант 2 — собрать локально из кода
 
 ```bash
-git clone https://github.com/ваш-репозиторий/unidecanat-bot.git
-cd unidecanat-bot
+git clone https://github.com/nayrest/UnifiedDeanOffice.git
+cd UnifiedDeanOffice
 
 cp .env.example .env
-# Откройте .env и впишите свой BOT_TOKEN
 
 docker compose up -d --build
 ```
